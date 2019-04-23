@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/Kurat/Documents/Gimbla/SimpleBGC_SerialApi/Inc
+HeaderPath=C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc
 HeaderFiles=stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=C:/Users/Kurat/Documents/Gimbla/SimpleBGC_SerialApi/Src
+SourcePath=C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Src
 SourceFiles=stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]

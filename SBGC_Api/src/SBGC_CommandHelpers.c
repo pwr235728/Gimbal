@@ -45,7 +45,14 @@ uint8_t SBGC_cmd_control_ext_send(SBGC_CMD_ControlExt_t *ctrlExt, SBGC_Parser_t 
 	return SBGC_Parser_sendCommand(parser, cmd);
 }
 
+uint8_t SBGC_cmd_control_rtData4_send(SBGC_Parser_t *parser)
+{
+	SBGC_SerialCommand_t cmd;
 
+	SBGC_SC_init(&cmd, SBGC_CMD_REALTIME_DATA_4);
+
+	return SBGC_Parser_sendCommand(parser, cmd);
+}
 
 // Realtime data
 

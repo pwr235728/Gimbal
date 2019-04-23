@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>SimpleBGC_SerialApi</name>
-	<comment></comment>
+	<comment />
 	<projects>
 		<project>SBGC_Api</project>
 	</projects>
@@ -29,17 +29,17 @@
 		<link>
 			<name>Src/SBGC_CommandHelpers.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_CommandHelpers.c</locationURI>
+			<location>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_CommandHelpers.c</location>
 		</link>
 		<link>
 			<name>Src/SBGC_Parser.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_Parser.c</locationURI>
+			<location>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_Parser.c</location>
 		</link>
 		<link>
 			<name>Src/SBGC_SerialCommand.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_SerialCommand.c</locationURI>
+			<location>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_SerialCommand.c</location>
 		</link>
 	</linkedResources>
 </projectDescription>

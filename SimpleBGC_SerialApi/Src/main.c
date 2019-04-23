@@ -39,13 +39,13 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SBGC.h"
-
+// delay between commands, ms
+#define SBGC_CMD_DELAY 20
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -77,7 +77,12 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
+SBGC_ComObj_t com;
+SBGC_Parser_t parser;
 
+SBGC_CMD_ControlExt_t ctrlExt;
+
+uint8_t rx_byte;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -91,12 +96,31 @@ uint8_t readByte(void){
 }
 
 void writeByte(uint8_t b){
-	HAL_UART_Transmit(&huart2, &b, 1, 100);
+	//HAL_UART_Transmit(&huart2, &b, 1, 100);
 	HAL_UART_Transmit(&huart1, &b, 1, 100);
 }
 
 uint16_t getOutEmptySpace(void){
 	return 0xFFFF;
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if(huart == &huart1){
+
+		HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
+		//HAL_UART_Transmit(&huart2, &rx_byte, 1, 1000);
+		if(SBGC_Parser_proccesChar(&parser, rx_byte) == PARSER_STATE_COMPLETE){
+			uint8_t complete[256];
+			SBGC_RealtimeData_4_t data;
+			SBGC_SerialCommand_t cmd = parser.rx_cmd;
+			if(cmd.id == SBGC_CMD_REALTIME_DATA_4){
+				SBGC_cmd_realtime_data_4_unpack(&data, &cmd);
+			}
+			uint32_t len = sprintf(complete, "id: %d, len: %d; data: \n", cmd.id, cmd.len);
+			HAL_UART_Transmit(&huart2, complete, len, 1000);
+		}
+	}
 }
 
 /* USER CODE END 0 */
@@ -108,19 +132,18 @@ uint16_t getOutEmptySpace(void){
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	SBGC_ComObj_t com;
+
+
+
+
 	com.getBytesAvailable = getBytesAvailable;
 	com.getOutEmptySpace = getOutEmptySpace;
 	com.readByte = readByte;
 	com.writeByte = writeByte;
 
-	SBGC_Parser_t parser;
+
 	SBGC_Parser_init(&parser, &com);
 
-	SBGC_CMD_ControlExt_t ctrlExt;
-	ctrlExt.mode[ROLL] = SBGC_CONTROL_MODE_SPEED;
-	ctrlExt.mode[PITCH] = SBGC_CONTROL_MODE_SPEED;
-	ctrlExt.mode[YAW] = SBGC_CONTROL_MODE_SPEED;
 
 	for(int i=0;i<3;i++){
 		ctrlExt.mode[i] = SBGC_CONTROL_MODE_SPEED;
@@ -152,7 +175,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
   //HAL_UART_Transmit(&huart2, data, sizeof(data), 1000);
  // HAL_UART_Transmit(&huart1, data, sizeof(data), 1000);
   /* USER CODE END 2 */
@@ -167,10 +190,15 @@ int main(void)
 		ctrlExt.data[YAW].speed = -45 * SBGC_SPEED_SCALE;
 		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		HAL_Delay(3000);
+		ctrlExt.data[YAW].speed = 0;
+		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		HAL_Delay(10);
 
-		/* USER CODE END WHILE */
+		SBGC_cmd_control_rtData4_send(&parser);
+		HAL_Delay(100);
+    /* USER CODE END WHILE */
 
-		/* USER CODE BEGIN 3 */
+    /* USER CODE BEGIN 3 */
 	}
   /* USER CODE END 3 */
 }
