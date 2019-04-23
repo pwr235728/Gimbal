@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>SimpleBGC_SerialApi</name>
-	<comment />
+	<comment></comment>
 	<projects>
+		<project>SBGC_Api</project>
+		<project>share_test</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -24,7 +26,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>fr.ac6.mcu.ide.core.MCUProjectNature</nature>
 	</natures>
-	<linkedResources>
-		
-	</linkedResources>
 </projectDescription>

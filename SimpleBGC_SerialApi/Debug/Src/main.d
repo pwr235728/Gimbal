@@ -1,11 +1,4 @@
 Src/main.o: ../Src/main.c \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/SBGC.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_command.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_parser.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_command.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_cmd_helpers.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_parser.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_rc.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc/main.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc/stm32f4xx_hal_conf.h \
@@ -31,21 +24,16 @@ Src/main.o: ../Src/main.c \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/SBGC.h:
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_command.h:
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_parser.h:
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_command.h:
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_cmd_helpers.h:
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_parser.h:
-
-C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/sbgc-api/include/SBGC_rc.h:
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Commands.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_SerialCommand.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_ComObj.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Parser.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Rc.h \
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_CommandHelpers.h \
+ C:/Users/Kurat/workspace_gimbal/share_test/test.h
 
 C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc/main.h:
 
@@ -98,3 +86,21 @@ C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_
 C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
 
 C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Commands.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_SerialCommand.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_ComObj.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Parser.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Rc.h:
+
+C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_CommandHelpers.h:
+
+C:/Users/Kurat/workspace_gimbal/share_test/test.h:

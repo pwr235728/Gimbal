@@ -17,6 +17,5 @@ C_DEPS :=
 SUBDIRS := \
 Drivers/STM32F4xx_HAL_Driver/Src \
 Src \
-sbgc-api/source \
 startup \
 

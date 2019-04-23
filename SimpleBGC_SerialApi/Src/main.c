@@ -39,12 +39,13 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
-#include <SBGC.h>
+
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "SBGC.h"
+#include "test.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,11 +117,18 @@ int main(void)
 	SBGC_Parser_t parser;
 	SBGC_Parser_init(&parser, &com);
 
-	SBGC_cmd_control_t ctrl;
-	ctrl.mode = SBGC_CONTROL_MODE_SPEED;
-	ctrl.speedPITCH = 0;
-	ctrl.speedROLL = 0;
-	ctrl.speedYAW = 0;
+	SBGC_CMD_ControlExt_t ctrlExt;
+	ctrlExt.mode[ROLL] = SBGC_CONTROL_MODE_SPEED;
+	ctrlExt.mode[PITCH] = SBGC_CONTROL_MODE_SPEED;
+	ctrlExt.mode[YAW] = SBGC_CONTROL_MODE_SPEED;
+
+	for(int i=0;i<3;i++){
+		ctrlExt.mode[i] = SBGC_CONTROL_MODE_SPEED;
+		ctrlExt.data[i].angle = 0;
+		ctrlExt.data[i].speed = 0;
+	}
+
+	func();
 
   /* USER CODE END 1 */
 
@@ -145,7 +153,6 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t data[] = {0x3E, 67, 15, (15+67)%256, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00, 0x50, 0x00, 0x00, 0x00, 0x00, 0xaf, 0xff, 0x68, 0x01, 0x6a};
 
   //HAL_UART_Transmit(&huart2, data, sizeof(data), 1000);
  // HAL_UART_Transmit(&huart1, data, sizeof(data), 1000);
@@ -153,18 +160,19 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	  ctrl.speedYAW = 30 * SBGC_SPEED_SCALE;
-	  SBGC_cmd_control_send(&ctrl, &parser);
-	  HAL_Delay(2000);
-	  ctrl.speedYAW = -30 * SBGC_SPEED_SCALE;
-	  SBGC_cmd_control_send(&ctrl, &parser);
-	 HAL_Delay(2000);
-    /* USER CODE END WHILE */
+	while (1) {
+		ctrlExt.data[YAW].speed = 45 * SBGC_SPEED_SCALE;
+		//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		HAL_Delay(3000);
 
-    /* USER CODE BEGIN 3 */
-  }
+		ctrlExt.data[YAW].speed = -45 * SBGC_SPEED_SCALE;
+		//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		HAL_Delay(3000);
+
+		/* USER CODE END WHILE */
+
+		/* USER CODE BEGIN 3 */
+	}
   /* USER CODE END 3 */
 }
 
