@@ -4,7 +4,6 @@
 	<comment></comment>
 	<projects>
 		<project>SBGC_Api</project>
-		<project>share_test</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -26,4 +25,21 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>fr.ac6.mcu.ide.core.MCUProjectNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>Src/SBGC_CommandHelpers.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_CommandHelpers.c</locationURI>
+		</link>
+		<link>
+			<name>Src/SBGC_Parser.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_Parser.c</locationURI>
+		</link>
+		<link>
+			<name>Src/SBGC_SerialCommand.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/SBGC_Api/src/SBGC_SerialCommand.c</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

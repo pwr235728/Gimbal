@@ -32,8 +32,7 @@ Src/main.o: ../Src/main.c \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Parser.h \
  C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Rc.h \
- C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_CommandHelpers.h \
- C:/Users/Kurat/workspace_gimbal/share_test/test.h
+ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_CommandHelpers.h
 
 C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc/main.h:
 
@@ -102,5 +101,3 @@ C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Parser.h:
 C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_Rc.h:
 
 C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc/SBGC_CommandHelpers.h:
-
-C:/Users/Kurat/workspace_gimbal/share_test/test.h:

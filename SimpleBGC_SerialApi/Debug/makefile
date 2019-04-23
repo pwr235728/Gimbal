@@ -32,13 +32,12 @@ all: SimpleBGC_SerialApi.elf
 
 dependents:
 	-cd C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug && $(MAKE) all
-	-cd C:/Users/Kurat/workspace_gimbal/share_test/Debug && $(MAKE) all
 
 # Tool invocations
-SimpleBGC_SerialApi.elf: $(OBJS) $(USER_OBJS) C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug/SBGC_Api.elf C:/Users/Kurat/workspace_gimbal/share_test/Debug/libshare_test.so ../STM32F446RETx_FLASH.ld
+SimpleBGC_SerialApi.elf: $(OBJS) $(USER_OBJS) C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug/SBGC_Api.elf ../STM32F446RETx_FLASH.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -L"C:\Users\Kurat\workspace_gimbal\share_test\Debug" -specs=nosys.specs -specs=nano.specs -T"../STM32F446RETx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "SimpleBGC_SerialApi.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -specs=nosys.specs -specs=nano.specs -T"../STM32F446RETx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "SimpleBGC_SerialApi.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
@@ -57,6 +56,5 @@ post-build:
 .PHONY: all clean dependents
 .SECONDARY: post-build
 C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug/SBGC_Api.elf:
-C:/Users/Kurat/workspace_gimbal/share_test/Debug/libshare_test.so:
 
 -include ../makefile.targets

@@ -45,7 +45,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SBGC.h"
-#include "test.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -128,7 +128,6 @@ int main(void)
 		ctrlExt.data[i].speed = 0;
 	}
 
-	func();
 
   /* USER CODE END 1 */
 
@@ -162,11 +161,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1) {
 		ctrlExt.data[YAW].speed = 45 * SBGC_SPEED_SCALE;
-		//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		HAL_Delay(3000);
 
 		ctrlExt.data[YAW].speed = -45 * SBGC_SPEED_SCALE;
-		//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		HAL_Delay(3000);
 
 		/* USER CODE END WHILE */
