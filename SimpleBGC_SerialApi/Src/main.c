@@ -183,19 +183,29 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
-		ctrlExt.data[YAW].speed = 45 * SBGC_SPEED_SCALE;
-		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		HAL_Delay(3000);
 
-		ctrlExt.data[YAW].speed = -45 * SBGC_SPEED_SCALE;
-		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		HAL_Delay(3000);
-		ctrlExt.data[YAW].speed = 0;
-		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		GPIO_PinState left = HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin);
+		GPIO_PinState right = HAL_GPIO_ReadPin(BTN_RIGHT_GPIO_Port, BTN_RIGHT_Pin);
+
+		if(left == right){
+			// stop
+			ctrlExt.data[YAW].speed =0;
+
+			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		}else if(left == GPIO_PIN_SET){
+			// turn left
+			ctrlExt.data[YAW].speed = -180 * SBGC_SPEED_SCALE;
+			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+
+		}else{
+			// turn right
+			ctrlExt.data[YAW].speed = 180 * SBGC_SPEED_SCALE;
+			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		}
+
 		HAL_Delay(10);
-
 		SBGC_cmd_control_rtData4_send(&parser);
-		HAL_Delay(100);
+		HAL_Delay(90);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -336,6 +346,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BTN_LEFT_Pin BTN_RIGHT_Pin */
+  GPIO_InitStruct.Pin = BTN_LEFT_Pin|BTN_RIGHT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
