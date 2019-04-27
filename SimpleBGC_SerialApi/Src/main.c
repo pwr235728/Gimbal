@@ -56,6 +56,18 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define GIMBAL_ROT_SPEED 10
+#define GIMBAL_JOY_RANGE 180;
+
+ #define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
+ #define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,6 +76,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc2;
+DMA_HandleTypeDef hdma_adc2;
+
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
@@ -74,8 +89,10 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_ADC2_Init(void);
 /* USER CODE BEGIN PFP */
 SBGC_ComObj_t com;
 SBGC_Parser_t parser;
@@ -83,6 +100,11 @@ SBGC_Parser_t parser;
 SBGC_CMD_ControlExt_t ctrlExt;
 
 uint8_t rx_byte;
+
+
+
+#define JOY_X 0
+#define JOY_Y 1
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -123,6 +145,31 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	}
 }
 
+float fmap(float x, float in_min, float in_max, float out_min, float out_max)
+{
+ float out = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+
+ out = max(out_min, min(out_max, out)); // range: -1.0f - 1.0f
+
+ return out;
+}
+
+
+float map_axis_from_adc(uint16_t raw_input, float dead_zone)
+{
+	float axis = fmap((float)raw_input, 0.0f, 4095.0f, -1.0f, 1.0f);
+
+	// Martwa strefa w œrodku
+	if(axis < -dead_zone){
+		axis = fmap(axis, -1.0f, -dead_zone, -1.0f, 0.0f);
+	}else if(axis > dead_zone){
+		axis = fmap(axis, dead_zone, 1.0f, 0.0f, 1.0f);
+	}else{
+		axis = 0;
+	}
+
+	return axis;
+}
 /* USER CODE END 0 */
 
 /**
@@ -132,7 +179,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	uint16_t joy_acd[4]; // [X, Y]
 
 
 
@@ -172,10 +219,16 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_USART2_UART_Init();
   MX_USART1_UART_Init();
+  MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
+
+
+ HAL_ADC_Start_DMA(&hadc2, joy_acd, 2);
+
   //HAL_UART_Transmit(&huart2, data, sizeof(data), 1000);
  // HAL_UART_Transmit(&huart1, data, sizeof(data), 1000);
   /* USER CODE END 2 */
@@ -183,13 +236,17 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
-
+		// HAL_ADC_Start_DMA(&hadc1, joy_acd, 2);
 		GPIO_PinState left = HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin);
 		GPIO_PinState right = HAL_GPIO_ReadPin(BTN_RIGHT_GPIO_Port, BTN_RIGHT_Pin);
+		GPIO_PinState up = HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin);
+		GPIO_PinState down = HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin);
 
 		if(left == right){
-			// stop
-			ctrlExt.data[YAW].speed =0;
+			//  JOYSTICK MODE
+			float joy_x = -map_axis_from_adc(joy_acd[JOY_X], 0.1f);
+			joy_x *= GIMBAL_JOY_RANGE;
+			ctrlExt.data[YAW].speed = joy_x * (SBGC_SPEED_SCALE);
 
 			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		}else if(left == GPIO_PIN_SET){
@@ -203,9 +260,27 @@ int main(void)
 			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		}
 
+		if(up == down){
+			//  JOYSTICK MODE
+			float joy_y = -map_axis_from_adc(joy_acd[JOY_Y], 0.1f);
+			joy_y *= GIMBAL_JOY_RANGE;
+			ctrlExt.data[PITCH].speed = joy_y * (SBGC_SPEED_SCALE);
+
+			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		}else if(up == GPIO_PIN_SET){
+			// turn up
+			ctrlExt.data[PITCH].speed = -180 * SBGC_SPEED_SCALE;
+			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+
+		}else{
+			// turn down
+			ctrlExt.data[PITCH].speed = 180 * SBGC_SPEED_SCALE;
+			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		}
+
 		HAL_Delay(10);
 		SBGC_cmd_control_rtData4_send(&parser);
-		HAL_Delay(90);
+		HAL_Delay(10);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -255,6 +330,65 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief ADC2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC2_Init(void)
+{
+
+  /* USER CODE BEGIN ADC2_Init 0 */
+
+  /* USER CODE END ADC2_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC2_Init 1 */
+
+  /* USER CODE END ADC2_Init 1 */
+  /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
+  */
+  hadc2.Instance = ADC2;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc2.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc2.Init.ScanConvMode = ENABLE;
+  hadc2.Init.ContinuousConvMode = ENABLE;
+  hadc2.Init.DiscontinuousConvMode = DISABLE;
+  hadc2.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc2.Init.NbrOfConversion = 2;
+  hadc2.Init.DMAContinuousRequests = ENABLE;
+  hadc2.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
+  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
+  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Rank = 2;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc2, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC2_Init 2 */
+
+  /* USER CODE END ADC2_Init 2 */
+
 }
 
 /**
@@ -323,6 +457,21 @@ static void MX_USART2_UART_Init(void)
 
 }
 
+/** 
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void) 
+{
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream2_IRQn);
+
+}
+
 /**
   * @brief GPIO Initialization Function
   * @param None
@@ -347,8 +496,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_LEFT_Pin BTN_RIGHT_Pin */
-  GPIO_InitStruct.Pin = BTN_LEFT_Pin|BTN_RIGHT_Pin;
+  /*Configure GPIO pins : BTN_LEFT_Pin BTN_RIGHT_Pin BTN_UP_Pin BTN_DOWN_Pin */
+  GPIO_InitStruct.Pin = BTN_LEFT_Pin|BTN_RIGHT_Pin|BTN_UP_Pin|BTN_DOWN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
