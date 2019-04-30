@@ -18,6 +18,7 @@
 "Src/SBGC_CommandHelpers.o"
 "Src/SBGC_Parser.o"
 "Src/SBGC_SerialCommand.o"
+"Src/circ_buf.o"
 "Src/main.o"
 "Src/stm32f4xx_hal_msp.o"
 "Src/stm32f4xx_it.o"

@@ -7,6 +7,7 @@ C_SRCS += \
 C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_CommandHelpers.c \
 C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_Parser.c \
 C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_SerialCommand.c \
+../Src/circ_buf.c \
 ../Src/main.c \
 ../Src/stm32f4xx_hal_msp.c \
 ../Src/stm32f4xx_it.c \
@@ -16,6 +17,7 @@ OBJS += \
 ./Src/SBGC_CommandHelpers.o \
 ./Src/SBGC_Parser.o \
 ./Src/SBGC_SerialCommand.o \
+./Src/circ_buf.o \
 ./Src/main.o \
 ./Src/stm32f4xx_hal_msp.o \
 ./Src/stm32f4xx_it.o \
@@ -25,6 +27,7 @@ C_DEPS += \
 ./Src/SBGC_CommandHelpers.d \
 ./Src/SBGC_Parser.d \
 ./Src/SBGC_SerialCommand.d \
+./Src/circ_buf.d \
 ./Src/main.d \
 ./Src/stm32f4xx_hal_msp.d \
 ./Src/stm32f4xx_it.d \

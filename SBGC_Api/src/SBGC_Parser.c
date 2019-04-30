@@ -49,8 +49,7 @@ SBGC_Parser_state SBGC_Parser_proccesChar(SBGC_Parser_t *parser, uint8_t c){
 			if (c == (uint8_t) parser->rx_cmd.id + parser->len
 					&& parser->len <= sizeof(parser->rx_cmd.data)) {
 				SBGC_Parser_initChecksum(parser);
-				parser->state = (
-						(parser->len == 0) ? STATE_GOT_DATA : STATE_GOT_HEADER);
+				parser->state = ((parser->len == 0) ? STATE_GOT_DATA : STATE_GOT_HEADER);
 			} else {
 				SBGC_Parser_onParseError(parser, PARSER_ERROR_PROTOCOL);
 				parser->state = STATE_WAIT;
@@ -104,6 +103,22 @@ uint8_t SBGC_Parser_send(SBGC_Parser_t *parser, uint8_t cmd_id, void *data, uint
 }
 uint8_t SBGC_Parser_sendCommand(SBGC_Parser_t *parser, SBGC_SerialCommand_t sc){
 	return SBGC_Parser_send(parser, sc.id, sc.data, sc.len);
+}
+SBGC_Parser_state SBGC_Parser_receiveCommand(SBGC_Parser_t *parser, SBGC_SerialCommand_t * sc_out)
+{
+	while(parser->com_obj->getBytesAvailable())
+	{
+
+		uint8_t rx_byte = parser->com_obj->readByte();
+		if(SBGC_Parser_proccesChar(parser, rx_byte) == PARSER_STATE_COMPLETE){
+
+			*sc_out = parser->rx_cmd;
+
+			return PARSER_STATE_COMPLETE;
+		}
+	}
+
+	return PARSER_STATE_INCOMPLETE;
 }
 uint16_t SBGC_Parser_getParseErrorCount(SBGC_Parser_t *parser){
 	return parser->parser_error_count;

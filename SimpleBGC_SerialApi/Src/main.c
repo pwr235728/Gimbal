@@ -44,6 +44,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SBGC.h"
+#include "circ_buf.h"
 // delay between commands, ms
 #define SBGC_CMD_DELAY 20
 /* USER CODE END Includes */
@@ -101,6 +102,8 @@ SBGC_CMD_ControlExt_t ctrlExt;
 
 uint8_t rx_byte;
 
+uint8_t _circ_buf_mem[1024];
+circ_buf_t rx_circ_buf;
 
 
 #define JOY_X 0
@@ -110,11 +113,13 @@ uint8_t rx_byte;
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint16_t getBytesAvailable(void){
-	return 0;
+	return rx_circ_buf.maxlen - 1 - circ_buf_get_bytes_available(&rx_circ_buf);
 }
 
 uint8_t readByte(void){
-	return 0;
+	uint8_t byte;
+	circ_buf_read(&rx_circ_buf, &byte);
+	return byte;
 }
 
 void writeByte(uint8_t b){
@@ -131,19 +136,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if(huart == &huart1){
 
 		HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
-		//HAL_UART_Transmit(&huart2, &rx_byte, 1, 1000);
-		if(SBGC_Parser_proccesChar(&parser, rx_byte) == PARSER_STATE_COMPLETE){
-			uint8_t complete[256];
-			SBGC_RealtimeData_4_t data;
-			SBGC_SerialCommand_t cmd = parser.rx_cmd;
-			if(cmd.id == SBGC_CMD_REALTIME_DATA_4){
-				SBGC_cmd_realtime_data_4_unpack(&data, &cmd);
-			}
-			uint32_t len = sprintf(complete, "id: %d, len: %d; data: \n", cmd.id, cmd.len);
-			HAL_UART_Transmit(&huart2, complete, len, 1000);
-		}
+		circ_buf_write(&rx_circ_buf, rx_byte);
+
+
+		//uint8_t complete[256];
+		//uint32_t len = sprintf(complete, "rx_byte: %x \n", rx_byte);
+		//HAL_UART_Transmit(&huart2, complete, len, 1000);
+
 	}
 }
+
 
 float fmap(float x, float in_min, float in_max, float out_min, float out_max)
 {
@@ -180,9 +182,10 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	uint16_t joy_acd[4]; // [X, Y]
+	circ_buf_init(&rx_circ_buf, _circ_buf_mem, 1024);
 
-
-
+	SBGC_SerialCommand_t rx_sc; // received command
+	SBGC_RealtimeData_4_t rt_d4; // received realtime data 4
 	com.getBytesAvailable = getBytesAvailable;
 	com.getOutEmptySpace = getOutEmptySpace;
 	com.readByte = readByte;
@@ -248,16 +251,16 @@ int main(void)
 			joy_x *= GIMBAL_JOY_RANGE;
 			ctrlExt.data[YAW].speed = joy_x * (SBGC_SPEED_SCALE);
 
-			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		}else if(left == GPIO_PIN_SET){
 			// turn left
 			ctrlExt.data[YAW].speed = -180 * SBGC_SPEED_SCALE;
-			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 
 		}else{
 			// turn right
 			ctrlExt.data[YAW].speed = 180 * SBGC_SPEED_SCALE;
-			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		}
 
 		if(up == down){
@@ -266,21 +269,36 @@ int main(void)
 			joy_y *= GIMBAL_JOY_RANGE;
 			ctrlExt.data[PITCH].speed = joy_y * (SBGC_SPEED_SCALE);
 
-			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		}else if(up == GPIO_PIN_SET){
 			// turn up
 			ctrlExt.data[PITCH].speed = -180 * SBGC_SPEED_SCALE;
-			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 
 		}else{
 			// turn down
 			ctrlExt.data[PITCH].speed = 180 * SBGC_SPEED_SCALE;
-			SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
 		}
 
-		HAL_Delay(10);
+		HAL_Delay(100);
 		SBGC_cmd_control_rtData4_send(&parser);
-		HAL_Delay(10);
+		HAL_Delay(100);
+
+
+
+		if(SBGC_Parser_receiveCommand(&parser, &rx_sc) == PARSER_STATE_COMPLETE){
+			if(rx_sc.id == SBGC_CMD_REALTIME_DATA_4){
+				SBGC_cmd_realtime_data_4_unpack(&rt_d4, &rx_sc);
+
+				uint8_t uart_tx[256];
+				uint32_t len = sprintf(uart_tx, "realtime_data_4 - imu angles: %f, %f, %f \r\n",
+						rt_d4.cmd_realtime_data_3.imu_angle[ROLL] * 0.02197265625f,
+						rt_d4.cmd_realtime_data_3.imu_angle[PITCH]*0.02197265625f,
+						rt_d4.cmd_realtime_data_3.imu_angle[YAW] * 0.02197265625f);
+				HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
+			}
+		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
