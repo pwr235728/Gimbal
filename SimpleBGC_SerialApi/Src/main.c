@@ -239,66 +239,31 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
-		// HAL_ADC_Start_DMA(&hadc1, joy_acd, 2);
-		GPIO_PinState left = HAL_GPIO_ReadPin(BTN_LEFT_GPIO_Port, BTN_LEFT_Pin);
-		GPIO_PinState right = HAL_GPIO_ReadPin(BTN_RIGHT_GPIO_Port, BTN_RIGHT_Pin);
-		GPIO_PinState up = HAL_GPIO_ReadPin(BTN_UP_GPIO_Port, BTN_UP_Pin);
-		GPIO_PinState down = HAL_GPIO_ReadPin(BTN_DOWN_GPIO_Port, BTN_DOWN_Pin);
 
-		if(left == right){
-			//  JOYSTICK MODE
-			float joy_x = -map_axis_from_adc(joy_acd[JOY_X], 0.1f);
-			joy_x *= GIMBAL_JOY_RANGE;
-			ctrlExt.data[YAW].speed = joy_x * (SBGC_SPEED_SCALE);
-
-			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		}else if(left == GPIO_PIN_SET){
-			// turn left
-			ctrlExt.data[YAW].speed = -180 * SBGC_SPEED_SCALE;
-			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-
-		}else{
-			// turn right
-			ctrlExt.data[YAW].speed = 180 * SBGC_SPEED_SCALE;
-			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		}
-
-		if(up == down){
-			//  JOYSTICK MODE
-			float joy_y = -map_axis_from_adc(joy_acd[JOY_Y], 0.1f);
-			joy_y *= GIMBAL_JOY_RANGE;
-			ctrlExt.data[PITCH].speed = joy_y * (SBGC_SPEED_SCALE);
-
-			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		}else if(up == GPIO_PIN_SET){
-			// turn up
-			ctrlExt.data[PITCH].speed = -180 * SBGC_SPEED_SCALE;
-			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-
-		}else{
-			// turn down
-			ctrlExt.data[PITCH].speed = 180 * SBGC_SPEED_SCALE;
-			//SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		}
-
-		HAL_Delay(100);
 		SBGC_cmd_control_rtData4_send(&parser);
-		HAL_Delay(100);
+		HAL_Delay(50);
 
 
+			if (SBGC_Parser_receiveCommand(&parser, &rx_sc)
+					== PARSER_STATE_COMPLETE) {
+				if (rx_sc.id == SBGC_CMD_CONFIRM) {
+					uint8_t uart_tx[256];
+					uint32_t len = sprintf(uart_tx, "CMD_CONFIRM\r\n");
+					HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
+				}
+				if (rx_sc.id == SBGC_CMD_REALTIME_DATA_4) {
+					SBGC_cmd_realtime_data_4_unpack(&rt_d4, &rx_sc);
 
-		if(SBGC_Parser_receiveCommand(&parser, &rx_sc) == PARSER_STATE_COMPLETE){
-			if(rx_sc.id == SBGC_CMD_REALTIME_DATA_4){
-				SBGC_cmd_realtime_data_4_unpack(&rt_d4, &rx_sc);
-
-				uint8_t uart_tx[256];
-				uint32_t len = sprintf(uart_tx, "realtime_data_4 - imu angles: %f, %f, %f \r\n",
-						rt_d4.cmd_realtime_data_3.imu_angle[ROLL] * 0.02197265625f,
-						rt_d4.cmd_realtime_data_3.imu_angle[PITCH]*0.02197265625f,
-						rt_d4.cmd_realtime_data_3.imu_angle[YAW] * 0.02197265625f);
-				HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
+					uint8_t uart_tx[256];
+					uint32_t len = sprintf(uart_tx,
+							"realtime_data_4 - imu angles: %f, %f, %f \r\n",
+							rt_d4.cmd_realtime_data_3.imu_angle[ROLL]* 0.02197265625f,
+							rt_d4.cmd_realtime_data_3.imu_angle[PITCH]*0.02197265625f,
+							rt_d4.cmd_realtime_data_3.imu_angle[YAW]* 0.02197265625f);
+					HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
+				}
 			}
-		}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
