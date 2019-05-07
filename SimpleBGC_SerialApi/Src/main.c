@@ -57,8 +57,10 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define GIMBAL_ROT_SPEED 10
-#define GIMBAL_JOY_RANGE 180;
+#define GIMBAL_ROT_SPEED 40
+
+#define CIRC_BUFF_LEN 1024
+
 
  #define max(a,b) \
    ({ __typeof__ (a) _a = (a); \
@@ -95,25 +97,36 @@ static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_ADC2_Init(void);
 /* USER CODE BEGIN PFP */
-SBGC_ComObj_t com;
-SBGC_Parser_t parser;
+SBGC_ComObj_t com;						// Zawiera adresy funkcji do kuminikacji ze sterownikiem
+SBGC_Parser_t parser;					// Przetwarza komendy wychodz¹ca i przychodz¹ce
 
-SBGC_CMD_ControlExt_t ctrlExt;
+SBGC_CMD_ControlExt_t ctrlExt;			// Kontrola gimbala
 
-uint8_t rx_byte;
+SBGC_SerialCommand_t rx_sc; 			// odebrana komenda
+SBGC_RealtimeData_4_t rt_d4; 			// struktura zawierajaca odebrana ramke realtime_data_4
 
-uint8_t _circ_buf_mem[1024];
+// Buffor ko³owy na odebrane dane
+uint8_t _circ_buf_mem[CIRC_BUFF_LEN];
 circ_buf_t rx_circ_buf;
 
 
+// zmienna przechowuj¹ca ostatnio odebrany bajt
+uint8_t rx_byte;
+
+
+
+// nr osi w tablicy przechowuj¹ce wartoœci z przetwornicka adc (joystick)
 #define JOY_X 0
 #define JOY_Y 1
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+// Definicja funkcji do kumunikacji ze sterownikiem
 uint16_t getBytesAvailable(void){
-	return rx_circ_buf.maxlen - 1 - circ_buf_get_bytes_available(&rx_circ_buf);
+	return  circ_buf_bytes_in_buf(&rx_circ_buf);
 }
 
 uint8_t readByte(void){
@@ -131,22 +144,22 @@ uint16_t getOutEmptySpace(void){
 	return 0xFFFF;
 }
 
+
+
+// Funkcja odbieraj¹ca dane z uartu
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart == &huart1){
 
-		HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
-		circ_buf_write(&rx_circ_buf, rx_byte);
-
-
-		//uint8_t complete[256];
-		//uint32_t len = sprintf(complete, "rx_byte: %x \n", rx_byte);
-		//HAL_UART_Transmit(&huart2, complete, len, 1000);
-
+		HAL_UART_Receive_IT(&huart1, &rx_byte, 1);	// Uruchamia oczekiwanie na kolejny bajt
+		circ_buf_write(&rx_circ_buf, rx_byte);  	// wpisuje bajt do buforu ko³owego
 	}
 }
 
 
+// zmiana skali wartosci wejsciowej na inna podana
+// in_min, in_max - zakres x
+// out_min, out_max -  zakresy wyjsciowe
 float fmap(float x, float in_min, float in_max, float out_min, float out_max)
 {
  float out = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -157,11 +170,12 @@ float fmap(float x, float in_min, float in_max, float out_min, float out_max)
 }
 
 
+// mapuje wartosc z adc  (przetwornik 12bit, zakres 0-4095) na zakres -1.0f do 1.0f z podana martwa strefa
 float map_axis_from_adc(uint16_t raw_input, float dead_zone)
 {
 	float axis = fmap((float)raw_input, 0.0f, 4095.0f, -1.0f, 1.0f);
 
-	// Martwa strefa w ï¿½rodku
+	// Martwa strefa w srodku
 	if(axis < -dead_zone){
 		axis = fmap(axis, -1.0f, -dead_zone, -1.0f, 0.0f);
 	}else if(axis > dead_zone){
@@ -173,14 +187,19 @@ float map_axis_from_adc(uint16_t raw_input, float dead_zone)
 	return axis;
 }
 
-SBGC_SerialCommand_t rx_sc; // received command
-SBGC_RealtimeData_4_t rt_d4; // received realtime data 4
 
+// funkcja przetwarza odebrane dane
+// jezeli odebrana zosta³a ramka realtime_data_4 to
+// wysyla katy z imu po innym uarcie do komputera
 void rx_return_cmd(){
 
-	if (SBGC_Parser_receiveCommand(&parser, &rx_sc)
+
+	// dopoki sa w buforze jakies odebrane komendy to je odczytuje
+	while (SBGC_Parser_receiveCommand(&parser, &rx_sc)
 			== PARSER_STATE_COMPLETE) {
 		if (rx_sc.id == SBGC_CMD_CONFIRM) {
+			// potwierdzenie ostatniej komendy
+
 			/*uint8_t uart_tx[256];
 			uint32_t len = sprintf(uart_tx, "CMD_CONFIRM\r\n");
 			HAL_UART_Transmit(&huart2, uart_tx, len, 1000);*/
@@ -191,9 +210,9 @@ void rx_return_cmd(){
 			uint8_t uart_tx[256];
 			uint32_t len = sprintf(uart_tx,
 					"realtime_data_4 - imu angles: %f, %f, %f \r\n",
-					rt_d4.cmd_realtime_data_3.imu_angle[ROLL]* 0.02197265625f,
-					rt_d4.cmd_realtime_data_3.imu_angle[PITCH]*0.02197265625f,
-					rt_d4.cmd_realtime_data_3.imu_angle[YAW]* 0.02197265625f);
+					SBGC_ANGLE_TO_DEGREE(rt_d4.cmd_realtime_data_3.imu_angle[ROLL]), // SBGC_ANGLE_TO_DEGREE   jest w pliku SBGC_CommandHelpers.h
+					SBGC_ANGLE_TO_DEGREE(rt_d4.cmd_realtime_data_3.imu_angle[PITCH]),
+					SBGC_ANGLE_TO_DEGREE(rt_d4.cmd_realtime_data_3.imu_angle[YAW]));
 			HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
 
 		}
@@ -211,18 +230,22 @@ void rx_return_cmd(){
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint16_t joy_acd[4]; // [X, Y]
-	circ_buf_init(&rx_circ_buf, _circ_buf_mem, 1024);
+	uint16_t joy_acd[2]; // [X, Y]
 
+	// Inicjalizacja bufora ko³owego
+	circ_buf_init(&rx_circ_buf, _circ_buf_mem, CIRC_BUFF_LEN);
+
+	// przypisanie funkcji do komunikacji
 	com.getBytesAvailable = getBytesAvailable;
 	com.getOutEmptySpace = getOutEmptySpace;
 	com.readByte = readByte;
 	com.writeByte = writeByte;
 
-
+	// inicjalizacja parsera
 	SBGC_Parser_init(&parser, &com);
 
 
+	// inicjalizacja struktury kontrolujacej gimbal
 	for(int i=0;i<3;i++){
 		ctrlExt.mode[i] = SBGC_CONTROL_MODE_SPEED;
 		ctrlExt.data[i].angle = 0;
@@ -255,36 +278,49 @@ int main(void)
   MX_USART1_UART_Init();
   MX_ADC2_Init();
   /* USER CODE BEGIN 2 */
+
+  // uruchomienie odbierania danych i przetwornika ADC
   HAL_UART_Receive_IT(&huart1, &rx_byte, 1);
+  HAL_ADC_Start_DMA(&hadc2, joy_acd, 2);
 
-
- HAL_ADC_Start_DMA(&hadc2, joy_acd, 2);
-
-  //HAL_UART_Transmit(&huart2, data, sizeof(data), 1000);
- // HAL_UART_Transmit(&huart1, data, sizeof(data), 1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+
+
 		float joy_x = -map_axis_from_adc(joy_acd[JOY_X], 0.1f);
-		joy_x *= GIMBAL_JOY_RANGE
-		;
+		joy_x *= GIMBAL_ROT_SPEED;
 		ctrlExt.data[YAW].speed = joy_x * (SBGC_SPEED_SCALE);
 
 		float joy_y = -map_axis_from_adc(joy_acd[JOY_Y], 0.1f);
-		joy_y *= GIMBAL_JOY_RANGE;
-
+		joy_y *= GIMBAL_ROT_SPEED;
 		ctrlExt.data[PITCH].speed = joy_y * (SBGC_SPEED_SCALE);
 
+
+		// wyslanie komendy sterujacej gimbalem
 		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
-		HAL_Delay(30);
-		rx_return_cmd();
+		HAL_Delay(30);		// odczekanie az dane zostana odebrane
+		rx_return_cmd();	// odebranie danych
 
+		// wyslanie zapytania o realtime_data_4
 		SBGC_cmd_control_rtData4_send(&parser);
-		HAL_Delay(30);
-		rx_return_cmd();
+		HAL_Delay(30); 		// odczekanie az dane zostana odebrane
+		rx_return_cmd(); 	// odebranie danych
 
+
+		// komendy mozna wysylac kilka naraz a pozniej odebrac dane na koncu np:
+		/*
+		 *
+		 SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		 SBGC_cmd_control_rtData4_send(&parser);
+		 .
+		 .
+		 .
+		 rx_return_cmd();
+
+		 */
 
     /* USER CODE END WHILE */
 

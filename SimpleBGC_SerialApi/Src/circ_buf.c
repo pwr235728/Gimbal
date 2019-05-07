@@ -48,3 +48,8 @@ uint32_t circ_buf_get_bytes_available(circ_buf_t *buf)
     	bytes_available += buf->maxlen;
     return bytes_available - 1; // -1 to account for the always-empty slot.
 }
+
+uint32_t circ_buf_bytes_in_buf(circ_buf_t *buf)
+{
+	 return buf->maxlen - 1 - circ_buf_get_bytes_available(rx_circ_buf);
+}

@@ -16,4 +16,6 @@ uint32_t circ_buf_write(circ_buf_t *buf, uint8_t data);
 uint32_t circ_buf_read(circ_buf_t *buf, uint8_t *data);
 
 uint32_t circ_buf_get_bytes_available(circ_buf_t *buf);
+uint32_t circ_buf_bytes_in_buf(circ_buf_t *buf);
+
 #endif /* CIRC_BUF_H_ */
