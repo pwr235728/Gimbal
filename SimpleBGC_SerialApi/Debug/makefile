@@ -31,10 +31,10 @@ endif
 all: SimpleBGC_SerialApi.elf
 
 dependents:
-	-cd C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug && $(MAKE) all
+	-cd /home/proxima/Documents/git/Gimbal/SBGC_Api/Debug && $(MAKE) all
 
 # Tool invocations
-SimpleBGC_SerialApi.elf: $(OBJS) $(USER_OBJS) C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug/SBGC_Api.elf ../STM32F446RETx_FLASH.ld
+SimpleBGC_SerialApi.elf: $(OBJS) $(USER_OBJS) /home/proxima/Documents/git/Gimbal/SBGC_Api/Debug/SBGC_Api.elf ../STM32F446RETx_FLASH.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
 	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -specs=nosys.specs -specs=nano.specs -u _printf_float -T"../STM32F446RETx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "SimpleBGC_SerialApi.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
@@ -55,6 +55,6 @@ post-build:
 
 .PHONY: all clean dependents
 .SECONDARY: post-build
-C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/Debug/SBGC_Api.elf:
+/home/proxima/Documents/git/Gimbal/SBGC_Api/Debug/SBGC_Api.elf:
 
 -include ../makefile.targets

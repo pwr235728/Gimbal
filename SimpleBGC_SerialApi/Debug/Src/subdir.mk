@@ -4,9 +4,9 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_CommandHelpers.c \
-C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_Parser.c \
-C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_SerialCommand.c \
+/home/proxima/Documents/git/Gimbal/SBGC_Api/src/SBGC_CommandHelpers.c \
+/home/proxima/Documents/git/Gimbal/SBGC_Api/src/SBGC_Parser.c \
+/home/proxima/Documents/git/Gimbal/SBGC_Api/src/SBGC_SerialCommand.c \
 ../Src/circ_buf.c \
 ../Src/main.c \
 ../Src/stm32f4xx_hal_msp.c \
@@ -35,27 +35,27 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Src/SBGC_CommandHelpers.o: C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_CommandHelpers.c
+Src/SBGC_CommandHelpers.o: /home/proxima/Documents/git/Gimbal/SBGC_Api/src/SBGC_CommandHelpers.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"/home/proxima/Documents/git/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-Src/SBGC_Parser.o: C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_Parser.c
+Src/SBGC_Parser.o: /home/proxima/Documents/git/Gimbal/SBGC_Api/src/SBGC_Parser.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"/home/proxima/Documents/git/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
-Src/SBGC_SerialCommand.o: C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/src/SBGC_SerialCommand.c
+Src/SBGC_SerialCommand.o: /home/proxima/Documents/git/Gimbal/SBGC_Api/src/SBGC_SerialCommand.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"/home/proxima/Documents/git/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -63,7 +63,7 @@ Src/%.o: ../Src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"C:/Users/Kurat/Documents/git_repos/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 '-D__weak=__attribute__((weak))' '-D__packed=__attribute__((__packed__))' -DUSE_HAL_DRIVER -DSTM32F446xx -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Device/ST/STM32F4xx/Include" -I"/home/proxima/Documents/git/Gimbal/SimpleBGC_SerialApi/Drivers/CMSIS/Include" -I"/home/proxima/Documents/git/Gimbal/SBGC_Api/inc"  -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

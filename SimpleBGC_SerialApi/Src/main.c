@@ -161,7 +161,7 @@ float map_axis_from_adc(uint16_t raw_input, float dead_zone)
 {
 	float axis = fmap((float)raw_input, 0.0f, 4095.0f, -1.0f, 1.0f);
 
-	// Martwa strefa w œrodku
+	// Martwa strefa w ï¿½rodku
 	if(axis < -dead_zone){
 		axis = fmap(axis, -1.0f, -dead_zone, -1.0f, 0.0f);
 	}else if(axis > dead_zone){
@@ -172,7 +172,37 @@ float map_axis_from_adc(uint16_t raw_input, float dead_zone)
 
 	return axis;
 }
+
+SBGC_SerialCommand_t rx_sc; // received command
+SBGC_RealtimeData_4_t rt_d4; // received realtime data 4
+
+void rx_return_cmd(){
+
+	if (SBGC_Parser_receiveCommand(&parser, &rx_sc)
+			== PARSER_STATE_COMPLETE) {
+		if (rx_sc.id == SBGC_CMD_CONFIRM) {
+			/*uint8_t uart_tx[256];
+			uint32_t len = sprintf(uart_tx, "CMD_CONFIRM\r\n");
+			HAL_UART_Transmit(&huart2, uart_tx, len, 1000);*/
+		}
+		if (rx_sc.id == SBGC_CMD_REALTIME_DATA_4) {
+			SBGC_cmd_realtime_data_4_unpack(&rt_d4, &rx_sc);
+
+			uint8_t uart_tx[256];
+			uint32_t len = sprintf(uart_tx,
+					"realtime_data_4 - imu angles: %f, %f, %f \r\n",
+					rt_d4.cmd_realtime_data_3.imu_angle[ROLL]* 0.02197265625f,
+					rt_d4.cmd_realtime_data_3.imu_angle[PITCH]*0.02197265625f,
+					rt_d4.cmd_realtime_data_3.imu_angle[YAW]* 0.02197265625f);
+			HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
+
+		}
+	}
+
+}
+
 /* USER CODE END 0 */
+
 
 /**
   * @brief  The application entry point.
@@ -184,8 +214,6 @@ int main(void)
 	uint16_t joy_acd[4]; // [X, Y]
 	circ_buf_init(&rx_circ_buf, _circ_buf_mem, 1024);
 
-	SBGC_SerialCommand_t rx_sc; // received command
-	SBGC_RealtimeData_4_t rt_d4; // received realtime data 4
 	com.getBytesAvailable = getBytesAvailable;
 	com.getOutEmptySpace = getOutEmptySpace;
 	com.readByte = readByte;
@@ -239,30 +267,24 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
+		float joy_x = -map_axis_from_adc(joy_acd[JOY_X], 0.1f);
+		joy_x *= GIMBAL_JOY_RANGE
+		;
+		ctrlExt.data[YAW].speed = joy_x * (SBGC_SPEED_SCALE);
+
+		float joy_y = -map_axis_from_adc(joy_acd[JOY_Y], 0.1f);
+		joy_y *= GIMBAL_JOY_RANGE;
+
+		ctrlExt.data[PITCH].speed = joy_y * (SBGC_SPEED_SCALE);
+
+		SBGC_cmd_control_ext_send(&ctrlExt, &parser);
+		HAL_Delay(30);
+		rx_return_cmd();
 
 		SBGC_cmd_control_rtData4_send(&parser);
-		HAL_Delay(50);
+		HAL_Delay(30);
+		rx_return_cmd();
 
-
-			if (SBGC_Parser_receiveCommand(&parser, &rx_sc)
-					== PARSER_STATE_COMPLETE) {
-				if (rx_sc.id == SBGC_CMD_CONFIRM) {
-					uint8_t uart_tx[256];
-					uint32_t len = sprintf(uart_tx, "CMD_CONFIRM\r\n");
-					HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
-				}
-				if (rx_sc.id == SBGC_CMD_REALTIME_DATA_4) {
-					SBGC_cmd_realtime_data_4_unpack(&rt_d4, &rx_sc);
-
-					uint8_t uart_tx[256];
-					uint32_t len = sprintf(uart_tx,
-							"realtime_data_4 - imu angles: %f, %f, %f \r\n",
-							rt_d4.cmd_realtime_data_3.imu_angle[ROLL]* 0.02197265625f,
-							rt_d4.cmd_realtime_data_3.imu_angle[PITCH]*0.02197265625f,
-							rt_d4.cmd_realtime_data_3.imu_angle[YAW]* 0.02197265625f);
-					HAL_UART_Transmit(&huart2, uart_tx, len, 1000);
-				}
-			}
 
     /* USER CODE END WHILE */
 
